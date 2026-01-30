@@ -11,37 +11,39 @@ st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wid
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. CSS: ESTILO PASTINHA DE ARQUIVO (RIHANNA STYLE) ---
+# --- 2. CSS: ESTILO FICHÁRIO / PASTINHA REAL ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
     
     header, [data-testid="stHeader"] {{ display: none !important; }}
     
-    .stApp {{ background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }}
+    /* Fundo suave para destacar as pastas */
+    .stApp {{ background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important; }}
 
-    /* ESTILO DAS ABAS (PASTINHAS) */
+    /* ESTILO DAS ABAS (TIPO PASTA DE ARQUIVO) */
     .stButton > button {{
-        border-radius: 15px 15px 0 0 !important;
+        border-radius: 20px 60px 0 0 !important; /* Formato de aba de pasta real */
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 800 !important; 
-        height: 60px !important; 
+        height: 70px !important; 
         text-transform: uppercase; 
         width: 100%;
-        margin-bottom: -4px !important;
+        margin-bottom: -5px !important;
         border: 2px solid #DEE2E6 !important;
-        background-color: #F8F9FA !important;
-        color: #6C757D !important;
-        transition: all 0.2s ease !important;
+        background-color: #e0e0e0 !important;
+        color: #888888 !important;
+        transition: all 0.3s ease !important;
+        box-shadow: inset 0 -5px 10px rgba(0,0,0,0.05);
     }}
 
-    /* ABA ATIVA: ROSA ESCURO E FUNDIDA COM O CONTEÚDO */
+    /* ABA ATIVA: ROSA ESCURO INTEGRADA AO CORPO */
     .aba-ativa > div > button {{
-        background-color: #D81B60 !important; /* Rosa mais escuro solicitado */
+        background-color: #D81B60 !important;
         color: white !important;
-        border: 2px solid #D81B60 !important;
-        border-bottom: 5px solid #D81B60 !important; /* Mescla com a linha inferior */
-        box-shadow: 0 -4px 15px rgba(216, 27, 96, 0.3) !important;
+        border: 3px solid #D81B60 !important;
+        border-bottom: 10px solid #D81B60 !important; /* "Funde" a aba na pasta */
+        box-shadow: 0 -5px 15px rgba(216, 27, 96, 0.3) !important;
         z-index: 100 !important;
     }}
 
@@ -50,7 +52,7 @@ st.markdown(f"""
         display: flex;
         justify-content: center;
         width: 100%;
-        margin-top: -12px;
+        margin-top: -15px;
         z-index: 101;
         position: relative;
     }}
@@ -58,31 +60,50 @@ st.markdown(f"""
     .triangulo {{
         width: 0;
         height: 0;
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
-        border-top: 15px solid #D81B60;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-top: 20px solid #D81B60;
     }}
 
-    /* MOLDURA DO MUNDO (INTEGRAÇÃO VISUAL) */
-    .moldura-mundo {{
-        border: 4px solid #D81B60;
-        border-radius: 20px;
-        padding: 30px;
-        background-color: rgba(255, 255, 255, 0.6);
-        margin-top: -4px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    /* O CORPO DA PASTA (MOLDURA INTEGRADA) */
+    .corpo-pasta {{
+        border: 5px solid #D81B60;
+        border-radius: 0 30px 30px 30px;
+        padding: 40px;
+        background-color: white;
+        margin-top: -5px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        min-height: 600px;
     }}
 
-    .instrucoes-card {{ background-color: white; border-radius: 15px; padding: 20px; border-left: 5px solid #D81B60; margin-bottom: 20px; min-height: 250px; }}
+    .instrucoes-card {{ 
+        background-color: #fdfdfd; 
+        border-radius: 15px; 
+        padding: 25px; 
+        border: 1px solid #eee;
+        border-left: 8px solid #D81B60; 
+        margin-bottom: 20px; 
+        min-height: 280px; 
+    }}
+
     h1, h2, h3 {{ font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #D81B60 !important; text-align: center; }}
-    [data-testid="stFileUploader"] {{ border: 2px dashed #D81B60 !important; border-radius: 20px !important; background: #FFFFFF !important; padding: 20px !important; }}
-    section[data-testid="stFileUploader"] button, div.stDownloadButton > button {{ background-color: #D81B60 !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important; }}
-    [data-testid="stSidebar"] {{ background-color: #FFFFFF !important; border-right: 1px solid #FFDEEF !important; min-width: 400px !important; }}
+    
+    [data-testid="stFileUploader"] {{ border: 3px dashed #D81B60 !important; border-radius: 20px !important; background: #fff9fb !important; }}
+    
+    section[data-testid="stFileUploader"] button, div.stDownloadButton > button {{ 
+        background-color: #D81B60 !important; 
+        color: white !important; 
+        font-weight: 700 !important; 
+        border-radius: 15px !important;
+        height: 50px !important;
+    }}
+
+    [data-testid="stSidebar"] {{ background-color: #FFFFFF !important; border-right: 2px solid #D81B60 !important; min-width: 400px !important; }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SISTEMA DE NAVEGAÇÃO (PORTEIRO) ---
-_, col_btn1, col_btn2, _ = st.columns([1.5, 1, 1, 1.5])
+# --- 3. NAVEGAÇÃO (AS ABAS DO FICHÁRIO) ---
+_, col_btn1, col_btn2, _ = st.columns([1.2, 1, 1, 1.2])
 
 with col_btn1:
     if st.session_state.mundo == "NFe": st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
@@ -98,15 +119,15 @@ with col_btn2:
         st.rerun()
     if st.session_state.mundo == "NFSe": st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 4. SETA CENTRALIZADA (MATEMÁTICA) ---
-_, s_nfe, s_nfse, _ = st.columns([1.5, 1, 1, 1.5])
+# --- 4. SETA DE INDICAÇÃO CENTRALIZADA ---
+_, s_nfe, s_nfse, _ = st.columns([1.2, 1, 1, 1.2])
 if st.session_state.mundo == "NFe":
     with s_nfe: st.markdown('<div class="setinha-container"><div class="triangulo"></div></div>', unsafe_allow_html=True)
 else:
     with s_nfse: st.markdown('<div class="setinha-container"><div class="triangulo"></div></div>', unsafe_allow_html=True)
 
-# INÍCIO DA MOLDURA INTEGRADA
-st.markdown('<div class="moldura-mundo">', unsafe_allow_html=True)
+# ABERTURA DO CORPO DA PASTA
+st.markdown('<div class="corpo-pasta">', unsafe_allow_html=True)
 
 # ==========================================
 # MUNDO 1: NF-e (MATRIZ FISCAL)
@@ -132,7 +153,7 @@ if st.session_state.mundo == "NFe":
             st.rerun()
 
     if st.session_state.lib_nfe:
-        f_nfe = st.file_uploader("Arquivos NF-e", type=["xml", "zip"], accept_multiple_files=True, key="up_nfe")
+        f_nfe = st.file_uploader("Arraste seus arquivos XML ou ZIP aqui", type=["xml", "zip"], accept_multiple_files=True, key="up_nfe")
         if st.button("🚀 PROCESSAR MATRIZ FISCAL"):
             dados_nfe = []
             for f in f_nfe:
@@ -145,8 +166,9 @@ if st.session_state.mundo == "NFe":
                 df_nfe = pd.DataFrame(dados_nfe)
                 out_nfe = io.BytesIO()
                 df_nfe.to_excel(out_nfe, index=False)
-                st.download_button("📥 BAIXAR MATRIZ", out_nfe.getvalue(), f"matriz_{cnpj_l}.xlsx")
-    else: st.warning("👈 Insira o CNPJ na lateral.")
+                st.success(f"✨ Sucesso! {len(df_nfe)} itens processados.")
+                st.download_button("📥 BAIXAR MATRIZ DIAMANTE", out_nfe.getvalue(), f"matriz_{cnpj_l}.xlsx")
+    else: st.warning("👈 Insira o CNPJ na lateral para liberar.")
 
 # ==========================================
 # MUNDO 2: NFS-e (AUDITORIA FISCAL)
@@ -161,7 +183,7 @@ else:
     with col2:
         st.markdown('<div class="instrucoes-card"><h3>📊 O que será obtido?</h3><ul><li><b>Leitura Universal:</b> Dados de centenas de prefeituras consolidados.</li><li><b>Gestão de ISS:</b> Separação entre ISS Próprio e Retido.</li><li><b>Impostos Federais:</b> Captura de PIS, COFINS, CSLL e IRRF.</li><li><b>Diagnóstico:</b> Identificação de notas com retenções pendentes.</li></ul></div>', unsafe_allow_html=True)
 
-    f_nfse = st.file_uploader("Arquivos NFS-e", type=["xml", "zip"], accept_multiple_files=True, key="up_nfse")
+    f_nfse = st.file_uploader("Arraste os arquivos XML ou ZIP aqui", type=["xml", "zip"], accept_multiple_files=True, key="up_nfse")
     if f_nfse and st.button("🚀 INICIAR AUDITORIA FISCAL"):
         dados_nfse = []
         for f in f_nfse:
@@ -179,6 +201,6 @@ else:
             st.dataframe(df_nfse)
             out_nfse = io.BytesIO()
             df_nfse.to_excel(out_nfse, index=False)
-            st.download_button("📥 BAIXAR AUDITORIA", out_nfse.getvalue(), "portal_servtax_auditoria.xlsx")
+            st.download_button("📥 BAIXAR EXCEL AJUSTADO", out_nfse.getvalue(), "portal_servtax_auditoria.xlsx")
 
-st.markdown('</div>', unsafe_allow_html=True) # FIM DA MOLDURA
+st.markdown('</div>', unsafe_allow_html=True) # FECHAMENTO DO CORPO-PASTA
