@@ -11,7 +11,7 @@ st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wid
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. CSS ESTILO ABAS DE CADERNO COM SETINHA ---
+# --- 2. CSS ESTILO ABAS DE CADERNO COM SETA INDICATIVA ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
@@ -20,12 +20,20 @@ st.markdown(f"""
     
     .stApp {{ background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }}
 
+    /* Container dos botões para garantir alinhamento */
+    .nav-wrapper {{
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 0;
+    }}
+
     /* Estilo Base das Abas */
     .stButton > button {{
         border-radius: 15px 15px 0 0 !important;
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 800 !important; 
-        height: 50px !important; 
+        height: 55px !important; 
         text-transform: uppercase; 
         width: 100%;
         margin-bottom: -2px !important;
@@ -33,39 +41,44 @@ st.markdown(f"""
         border: 1px solid #DEE2E6 !important;
         background-color: rgba(255, 255, 255, 0.5) !important;
         color: #6C757D !important;
-        position: relative;
     }}
 
-    /* Aba Ativa com Contorno Rosa */
+    /* ABA ATIVA: Contorno Rosa e Destaque */
     .aba-ativa > div > button {{
         background-color: #FFFFFF !important;
         color: #FF69B4 !important;
-        border: 2px solid #FF69B4 !important; /* Contorno mais visível */
-        border-bottom: 3px solid #FFFFFF !important; /* Mescla com a linha */
-        box-shadow: 0 -4px 10px rgba(255, 105, 180, 0.1) !important;
+        border: 2px solid #FF69B4 !important; /* Contorno Rosa solicitado */
+        border-bottom: 4px solid #FFFFFF !important; /* Abre a base para a folha */
+        box-shadow: 0 -4px 12px rgba(255, 105, 180, 0.15) !important;
         z-index: 10;
+        position: relative;
     }}
 
-    /* A Setinha Indicativa */
+    /* A SETINHA INDICATIVA (Triângulo abaixo da aba) */
     .aba-ativa > div > button::after {{
-        content: '▼';
+        content: '';
         position: absolute;
-        bottom: -25px;
+        bottom: -15px; /* Posiciona logo abaixo da aba */
         left: 50%;
         transform: translateX(-50%);
-        color: #FF69B4;
-        font-size: 20px;
+        width: 0;
+        height: 0;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-top: 12px solid #FF69B4; /* Cor da setinha */
+        z-index: 11;
     }}
     
     .stButton > button:hover {{ 
         color: #FF69B4 !important; 
+        border-color: #FF69B4 !important;
     }}
 
-    /* Linha Divisora Rosa */
+    /* Linha do Caderno que une as abas ao conteúdo */
     .linha-caderno {{
         border-bottom: 2px solid #FF69B4;
         margin-top: -2px;
-        margin-bottom: 40px;
+        margin-bottom: 45px; /* Espaço para a setinha não bater no título */
         width: 100%;
     }}
 
@@ -84,7 +97,7 @@ _, col_btn1, col_btn2, _ = st.columns([1.5, 1, 1, 1.5])
 with col_btn1:
     if st.session_state.mundo == "NFe":
         st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
-    if st.button("💎 PORTAL TAX NF-e"):
+    if st.button("💎 PORTAL TAX NF-e", key="btn_nfe"):
         st.session_state.mundo = "NFe"
         st.rerun()
     if st.session_state.mundo == "NFe":
@@ -93,7 +106,7 @@ with col_btn1:
 with col_btn2:
     if st.session_state.mundo == "NFSe":
         st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
-    if st.button("📑 PORTAL TAX NFS-e"):
+    if st.button("📑 PORTAL TAX NFS-e", key="btn_nfse"):
         st.session_state.mundo = "NFSe"
         st.rerun()
     if st.session_state.mundo == "NFSe":
@@ -128,7 +141,6 @@ if st.session_state.mundo == "NFe":
             st.rerun()
 
     if st.session_state.lib_nfe:
-        st.info(f"🏢 Empresa Liberada: {cnpj_l}")
         f_nfe = st.file_uploader("Arraste seus arquivos XML ou ZIP aqui", type=["xml", "zip"], accept_multiple_files=True, key="up_nfe")
         if st.button("🚀 PROCESSAR MATRIZ FISCAL"):
             dados_nfe = []
@@ -144,9 +156,8 @@ if st.session_state.mundo == "NFe":
                 out_nfe = io.BytesIO()
                 with pd.ExcelWriter(out_nfe, engine='xlsxwriter') as writer:
                     df_nfe.to_excel(writer, index=False)
-                st.success(f"✨ Sucesso! {len(df_nfe)} itens organizados.")
                 st.download_button("📥 BAIXAR MATRIZ DIAMANTE", out_nfe.getvalue(), f"matriz_{cnpj_l}.xlsx")
-    else: st.warning("👈 Insira o CNPJ na barra lateral e clique em 'Liberar Operação' para começar.")
+    else: st.warning("👈 Insira o CNPJ na barra lateral.")
 
 # ==========================================
 # MUNDO 2: NFS-e (AUDITORIA FISCAL)
@@ -176,17 +187,9 @@ else:
                 else:
                     r = motor_nfse.process_xml_file_nfse(f.read(), f.name)
                     if r: dados_nfse.append(r)
-        
         if dados_nfse:
             df_nfse = pd.DataFrame(dados_nfse)
-            cols_fin = ['Vlr_Bruto', 'Vlr_Liquido', 'ISS_Valor', 'Ret_ISS', 'Ret_PIS', 'Ret_COFINS', 'Ret_CSLL', 'Ret_IRRF']
-            for c in cols_fin: df_nfse[c] = pd.to_numeric(df_nfse[c], errors='coerce').fillna(0.0)
-            df_nfse['Diagnostico'] = df_nfse.apply(lambda r: "⚠️ Divergência!" if abs(r['Vlr_Bruto'] - r['Vlr_Liquido']) > 0.01 else "✅", axis=1)
-            
-            st.success(f"✅ {len(df_nfse)} notas processadas!")
             st.dataframe(df_nfse)
-            
             out_nfse = io.BytesIO()
-            with pd.ExcelWriter(out_nfse, engine='xlsxwriter') as writer:
-                df_nfse.to_excel(writer, index=False, sheet_name='PortalServTax')
+            df_nfse.to_excel(out_nfse, index=False)
             st.download_button("📥 BAIXAR EXCEL AJUSTADO", out_nfse.getvalue(), "portal_servtax_auditoria.xlsx")
