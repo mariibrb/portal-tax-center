@@ -5,19 +5,20 @@ import zipfile
 import motor_nfe
 import motor_nfse
 
-# --- 1. CONFIGURAÇÃO ---
+# --- 1. CONFIGURAÇÃO (DEVE SER O PRIMEIRO COMANDO) ---
 st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wide")
 
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. CSS: ABAS COLORIDAS E ESTILO DA SETA ---
+# --- 2. CSS: ABAS DE CADERNO E LINHA CONECTORA ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
     
     header, [data-testid="stHeader"] {{ display: none !important; }}
     
+    /* Fundo original */
     .stApp {{ background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }}
 
     /* ESTILO DAS ABAS */
@@ -29,37 +30,43 @@ st.markdown(f"""
         text-transform: uppercase; 
         width: 100%;
         margin-bottom: -2px !important;
+        transition: all 0.2s ease !important;
         border: 2px solid #DEE2E6 !important;
         background-color: #F8F9FA !important;
         color: #6C757D !important;
-        transition: all 0.2s ease !important;
     }}
 
-    /* ABA SELECIONADA: ROSA VIBRANTE */
+    /* ABA ATIVA (ROSA RIHANNA) */
     .aba-ativa > div > button {{
         background-color: #FF69B4 !important;
         color: white !important;
         border: 2px solid #FF69B4 !important;
         box-shadow: 0 -4px 15px rgba(255, 105, 180, 0.3) !important;
+        position: relative !important;
     }}
 
-    /* ESTILO DA SETINHA INDICADORA */
-    .setinha-v {{
-        color: #FF69B4;
-        font-size: 35px;
-        text-align: center;
-        line-height: 1;
-        margin-top: -15px; /* Puxa para cima para encostar na aba */
+    /* A SETA (TRIÂNGULO) - USANDO HTML INJETADO PARA NÃO DESALINHAR */
+    .setinha-container {{
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: -15px;
         margin-bottom: 5px;
-        font-family: Arial, sans-serif;
-        font-weight: bold;
+    }}
+    
+    .triangulo {{
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 15px solid #FF69B4;
     }}
 
     /* LINHA DO CADERNO */
     .linha-caderno {{
         border-bottom: 4px solid #FF69B4;
         margin-top: -5px;
-        margin-bottom: 40px;
+        margin-bottom: 45px;
         width: 100%;
     }}
 
@@ -71,10 +78,9 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SISTEMA DE NAVEGAÇÃO (PROPORÇÕES TRAVADAS) ---
-# Usamos 2-1-0.1-1-2 para centralizar os botões
-cols = [2, 1, 0.1, 1, 2]
-_, col_btn1, espaco, col_btn2, _ = st.columns(cols)
+# --- 3. SISTEMA DE NAVEGAÇÃO ---
+# Criamos o esqueleto das abas
+_, col_btn1, col_btn2, _ = st.columns([1.5, 1, 1, 1.5])
 
 with col_btn1:
     if st.session_state.mundo == "NFe": st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
@@ -90,12 +96,14 @@ with col_btn2:
         st.rerun()
     if st.session_state.mundo == "NFSe": st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 4. A SETA (USANDO AS MESMAS COLUNAS PARA CENTRALIZAÇÃO PERFEITA) ---
-_, s1, _, s2, _ = st.columns(cols)
+# --- A MÁGICA DA CENTRALIZAÇÃO ---
+# Criamos a mesma estrutura de colunas para a seta
+_, s_nfe, s_nfse, _ = st.columns([1.5, 1, 1, 1.5])
+
 if st.session_state.mundo == "NFe":
-    with s1: st.markdown('<div class="setinha-v">▼</div>', unsafe_allow_html=True)
+    with s_nfe: st.markdown('<div class="setinha-container"><div class="triangulo"></div></div>', unsafe_allow_html=True)
 else:
-    with s2: st.markdown('<div class="setinha-v">▼</div>', unsafe_allow_html=True)
+    with s_nfse: st.markdown('<div class="setinha-container"><div class="triangulo"></div></div>', unsafe_allow_html=True)
 
 st.markdown('<div class="linha-caderno"></div>', unsafe_allow_html=True)
 
