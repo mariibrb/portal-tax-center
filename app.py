@@ -11,17 +11,16 @@ st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wid
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. CSS: ABAS DE CADERNO E LINHA CONECTORA ---
+# --- 2. CSS: ESTILO PASTINHA DE ARQUIVO (RIHANNA STYLE) ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
     
     header, [data-testid="stHeader"] {{ display: none !important; }}
     
-    /* Fundo original */
     .stApp {{ background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }}
 
-    /* ESTILO DAS ABAS */
+    /* ESTILO DAS ABAS (PASTINHAS) */
     .stButton > button {{
         border-radius: 15px 15px 0 0 !important;
         font-family: 'Montserrat', sans-serif !important;
@@ -29,29 +28,31 @@ st.markdown(f"""
         height: 60px !important; 
         text-transform: uppercase; 
         width: 100%;
-        margin-bottom: -2px !important;
-        transition: all 0.2s ease !important;
+        margin-bottom: -4px !important;
         border: 2px solid #DEE2E6 !important;
         background-color: #F8F9FA !important;
         color: #6C757D !important;
+        transition: all 0.2s ease !important;
     }}
 
-    /* ABA ATIVA (ROSA RIHANNA) */
+    /* ABA ATIVA: ROSA ESCURO E FUNDIDA COM O CONTEÚDO */
     .aba-ativa > div > button {{
-        background-color: #FF69B4 !important;
+        background-color: #D81B60 !important; /* Rosa mais escuro solicitado */
         color: white !important;
-        border: 2px solid #FF69B4 !important;
-        box-shadow: 0 -4px 15px rgba(255, 105, 180, 0.3) !important;
-        position: relative !important;
+        border: 2px solid #D81B60 !important;
+        border-bottom: 5px solid #D81B60 !important; /* Mescla com a linha inferior */
+        box-shadow: 0 -4px 15px rgba(216, 27, 96, 0.3) !important;
+        z-index: 100 !important;
     }}
 
-    /* A SETA (TRIÂNGULO) - USANDO HTML INJETADO PARA NÃO DESALINHAR */
+    /* SETINHA CENTRALIZADA NA ABA */
     .setinha-container {{
         display: flex;
         justify-content: center;
         width: 100%;
-        margin-top: -15px;
-        margin-bottom: 5px;
+        margin-top: -12px;
+        z-index: 101;
+        position: relative;
     }}
     
     .triangulo {{
@@ -59,27 +60,28 @@ st.markdown(f"""
         height: 0;
         border-left: 15px solid transparent;
         border-right: 15px solid transparent;
-        border-top: 15px solid #FF69B4;
+        border-top: 15px solid #D81B60;
     }}
 
-    /* LINHA DO CADERNO */
-    .linha-caderno {{
-        border-bottom: 4px solid #FF69B4;
-        margin-top: -5px;
-        margin-bottom: 45px;
-        width: 100%;
+    /* MOLDURA DO MUNDO (INTEGRAÇÃO VISUAL) */
+    .moldura-mundo {{
+        border: 4px solid #D81B60;
+        border-radius: 20px;
+        padding: 30px;
+        background-color: rgba(255, 255, 255, 0.6);
+        margin-top: -4px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }}
 
-    .instrucoes-card {{ background-color: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 20px; border-left: 5px solid #FF69B4; margin-bottom: 20px; min-height: 250px; }}
-    h1, h2, h3 {{ font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #FF69B4 !important; text-align: center; }}
-    [data-testid="stFileUploader"] {{ border: 2px dashed #FF69B4 !important; border-radius: 20px !important; background: #FFFFFF !important; padding: 20px !important; }}
-    section[data-testid="stFileUploader"] button, div.stDownloadButton > button {{ background-color: #FF69B4 !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important; }}
+    .instrucoes-card {{ background-color: white; border-radius: 15px; padding: 20px; border-left: 5px solid #D81B60; margin-bottom: 20px; min-height: 250px; }}
+    h1, h2, h3 {{ font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #D81B60 !important; text-align: center; }}
+    [data-testid="stFileUploader"] {{ border: 2px dashed #D81B60 !important; border-radius: 20px !important; background: #FFFFFF !important; padding: 20px !important; }}
+    section[data-testid="stFileUploader"] button, div.stDownloadButton > button {{ background-color: #D81B60 !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important; }}
     [data-testid="stSidebar"] {{ background-color: #FFFFFF !important; border-right: 1px solid #FFDEEF !important; min-width: 400px !important; }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SISTEMA DE NAVEGAÇÃO ---
-# Criamos o esqueleto das abas
+# --- 3. SISTEMA DE NAVEGAÇÃO (PORTEIRO) ---
 _, col_btn1, col_btn2, _ = st.columns([1.5, 1, 1, 1.5])
 
 with col_btn1:
@@ -96,16 +98,15 @@ with col_btn2:
         st.rerun()
     if st.session_state.mundo == "NFSe": st.markdown('</div>', unsafe_allow_html=True)
 
-# --- A MÁGICA DA CENTRALIZAÇÃO ---
-# Criamos a mesma estrutura de colunas para a seta
+# --- 4. SETA CENTRALIZADA (MATEMÁTICA) ---
 _, s_nfe, s_nfse, _ = st.columns([1.5, 1, 1, 1.5])
-
 if st.session_state.mundo == "NFe":
     with s_nfe: st.markdown('<div class="setinha-container"><div class="triangulo"></div></div>', unsafe_allow_html=True)
 else:
     with s_nfse: st.markdown('<div class="setinha-container"><div class="triangulo"></div></div>', unsafe_allow_html=True)
 
-st.markdown('<div class="linha-caderno"></div>', unsafe_allow_html=True)
+# INÍCIO DA MOLDURA INTEGRADA
+st.markdown('<div class="moldura-mundo">', unsafe_allow_html=True)
 
 # ==========================================
 # MUNDO 1: NF-e (MATRIZ FISCAL)
@@ -179,3 +180,5 @@ else:
             out_nfse = io.BytesIO()
             df_nfse.to_excel(out_nfse, index=False)
             st.download_button("📥 BAIXAR AUDITORIA", out_nfse.getvalue(), "portal_servtax_auditoria.xlsx")
+
+st.markdown('</div>', unsafe_allow_html=True) # FIM DA MOLDURA
