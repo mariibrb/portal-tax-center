@@ -15,32 +15,62 @@ st.markdown("""
     header, [data-testid="stHeader"] { display: none !important; }
     .stApp { background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }
     
-    div.stButton > button {
-        color: #6C757D !important; background-color: #FFFFFF !important; border: 1px solid #DEE2E6 !important;
-        border-radius: 15px !important; font-family: 'Montserrat', sans-serif !important;
-        font-weight: 800 !important; height: 60px !important; text-transform: uppercase; width: 100%;
+    /* Botões do Porteiro - Ajuste de Design */
+    .stButton > button {
+        color: #6C757D !important; 
+        background-color: #FFFFFF !important; 
+        border: 1px solid #DEE2E6 !important;
+        border-radius: 15px !important; 
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 800 !important; 
+        height: 55px !important; 
+        text-transform: uppercase; 
+        width: 100%;
         transition: all 0.4s ease !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
     }
-    div.stButton > button:hover { border-color: #FF69B4 !important; color: #FF69B4 !important; transform: translateY(-5px); }
+    
+    .stButton > button:hover { 
+        border-color: #FF69B4 !important; 
+        color: #FF69B4 !important; 
+        transform: translateY(-3px); 
+        box-shadow: 0 8px 15px rgba(255,105,180,0.1) !important;
+    }
     
     .instrucoes-card { background-color: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 20px; border-left: 5px solid #FF69B4; margin-bottom: 20px; min-height: 250px; }
     h1, h2, h3 { font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #FF69B4 !important; text-align: center; }
-    [data-testid="stFileUploader"] { border: 2px dashed #FF69B4 !important; border-radius: 20px !important; background: #FFFFFF !important; padding: 20px !important; }
-    section[data-testid="stFileUploader"] button, div.stDownloadButton > button { background-color: #FF69B4 !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important; }
+    
+    [data-testid="stFileUploader"] { 
+        border: 2px dashed #FF69B4 !important; 
+        border-radius: 20px !important; 
+        background: #FFFFFF !important; 
+        padding: 20px !important; 
+    }
+    
+    section[data-testid="stFileUploader"] button, div.stDownloadButton > button { 
+        background-color: #FF69B4 !important; 
+        color: white !important; 
+        font-weight: 700 !important; 
+        border-radius: 15px !important; 
+    }
     
     [data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #FFDEEF !important; min-width: 400px !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SISTEMA DE NAVEGAÇÃO ---
+# --- 3. SISTEMA DE NAVEGAÇÃO CENTRALIZADO ---
 if "mundo" not in st.session_state: st.session_state.mundo = "NFe"
 
-c_nav1, c_nav2, _ = st.columns([1, 1, 2])
-with c_nav1:
+# Criamos uma estrutura de 5 colunas onde as 3 centrais seguram os botões e o espaço entre eles
+# Isso garante que eles fiquem "juntos" no centro, sem estarem espalhados nas pontas
+_, col_btn1, espaco, col_btn2, _ = st.columns([2, 1, 0.1, 1, 2])
+
+with col_btn1:
     if st.button("💎 PORTAL TAX NF-e"):
         st.session_state.mundo = "NFe"
         st.rerun()
-with c_nav2:
+
+with col_btn2:
     if st.button("📑 PORTAL TAX NFS-e"):
         st.session_state.mundo = "NFSe"
         st.rerun()
@@ -56,7 +86,6 @@ if st.session_state.mundo == "NFe":
     
     m_col1, m_col2 = st.columns(2)
     with m_col1:
-        # RESTAURADO: Texto original do motor NFe
         st.markdown("""
         <div class="instrucoes-card">
             <h3>📖 Manual de Uso</h3>
@@ -67,7 +96,6 @@ if st.session_state.mundo == "NFe":
             </ol>
         </div>""", unsafe_allow_html=True)
     with m_col2:
-        # RESTAURADO: Texto original do motor NFe
         st.markdown("""
         <div class="instrucoes-card">
             <h3>🎯 Dados Obtidos</h3>
@@ -117,11 +145,10 @@ if st.session_state.mundo == "NFe":
 # ==========================================
 else:
     st.markdown("<style>[data-testid='stSidebar'], [data-testid='stSidebarCollapsedControl'] { display: none !important; }</style>", unsafe_allow_html=True)
-    st.title("PORTAL TAX NFS-e - AUDITORIA FISCAL")
+    st.markdown("<h1>PORTAL TAX NFS-e - AUDITORIA FISCAL</h1>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
-        # RESTAURADO: Texto original do motor NFSe
         st.markdown("""
         <div class="instrucoes-card">
             <h3>📖 Passo a Passo</h3>
@@ -133,7 +160,6 @@ else:
             </ol>
         </div>""", unsafe_allow_html=True)
     with col2:
-        # RESTAURADO: Texto original do motor NFSe
         st.markdown("""
         <div class="instrucoes-card">
             <h3>📊 O que será obtido?</h3>
