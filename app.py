@@ -11,50 +11,61 @@ st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wid
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. CSS ESTILO DIVISOR DE CADERNO ---
+# --- 2. CSS ESTILO ABAS DE CADERNO COM SETINHA ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
     
     header, [data-testid="stHeader"] {{ display: none !important; }}
     
-    /* Fundo original preservado */
     .stApp {{ background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }}
 
-    /* Estilo dos Botões como Abas de Caderno */
+    /* Estilo Base das Abas */
     .stButton > button {{
-        border-radius: 15px 15px 0 0 !important; /* Arredondado só em cima */
+        border-radius: 15px 15px 0 0 !important;
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 800 !important; 
         height: 50px !important; 
         text-transform: uppercase; 
         width: 100%;
-        margin-bottom: -2px !important; /* Encosta na linha */
+        margin-bottom: -2px !important;
         transition: all 0.3s ease !important;
         border: 1px solid #DEE2E6 !important;
         background-color: rgba(255, 255, 255, 0.5) !important;
         color: #6C757D !important;
+        position: relative;
     }}
 
-    /* Aba Ativa (Mundo Selecionado) */
+    /* Aba Ativa com Contorno Rosa */
     .aba-ativa > div > button {{
         background-color: #FFFFFF !important;
         color: #FF69B4 !important;
-        border: 1px solid #FF69B4 !important;
-        border-bottom: 2px solid #FFFFFF !important; /* Apaga a linha embaixo */
+        border: 2px solid #FF69B4 !important; /* Contorno mais visível */
+        border-bottom: 3px solid #FFFFFF !important; /* Mescla com a linha */
         box-shadow: 0 -4px 10px rgba(255, 105, 180, 0.1) !important;
         z-index: 10;
+    }}
+
+    /* A Setinha Indicativa */
+    .aba-ativa > div > button::after {{
+        content: '▼';
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #FF69B4;
+        font-size: 20px;
     }}
     
     .stButton > button:hover {{ 
         color: #FF69B4 !important; 
     }}
 
-    /* Linha Divisora (Folha de Caderno) */
+    /* Linha Divisora Rosa */
     .linha-caderno {{
         border-bottom: 2px solid #FF69B4;
         margin-top: -2px;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
         width: 100%;
     }}
 
@@ -67,7 +78,7 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SISTEMA DE NAVEGAÇÃO (ABAS DE CADERNO) ---
+# --- 3. SISTEMA DE NAVEGAÇÃO ---
 _, col_btn1, col_btn2, _ = st.columns([1.5, 1, 1, 1.5])
 
 with col_btn1:
@@ -88,7 +99,6 @@ with col_btn2:
     if st.session_state.mundo == "NFSe":
         st.markdown('</div>', unsafe_allow_html=True)
 
-# Linha que conecta as abas
 st.markdown('<div class="linha-caderno"></div>', unsafe_allow_html=True)
 
 # ==========================================
