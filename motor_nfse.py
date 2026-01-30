@@ -14,7 +14,6 @@ def process_xml_file_nfse(content, filename):
         root = tree.getroot()
         iss_retido_flag = get_xml_value_nfse(root, ['ISSRetido']).lower()
         tp_ret_flag = get_xml_value_nfse(root, ['tpRetISSQN'])
-        
         row = {
             'Arquivo': filename,
             'Nota_Numero': get_xml_value_nfse(root, ['nNFSe', 'NumeroNFe', 'nNF', 'numero', 'Numero']),
@@ -32,7 +31,6 @@ def process_xml_file_nfse(content, filename):
             'Ret_IRRF': get_xml_value_nfse(root, ['vIR', 'ValorIR', 'vIR_Ret', 'IRRetido', 'vRetIR', 'vIRRF']),
             'Descricao': get_xml_value_nfse(root, ['CodigoServico', 'itemServico', 'cServ', 'xDescServ', 'Discriminacao', 'xServ', 'infCpl', 'xProd'])
         }
-
         if tp_ret_flag == '2' or iss_retido_flag == 'true':
              row['Ret_ISS'] = get_xml_value_nfse(root, ['vTotTribMun', 'vISSRetido', 'ValorISS_Retido', 'vRetISS', 'vISSRet', 'iss/vRet'])
         elif iss_retido_flag == 'false' or tp_ret_flag == '1':
