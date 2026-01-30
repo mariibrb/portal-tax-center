@@ -11,98 +11,92 @@ st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wid
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. DEFINIÇÃO DE CORES POR MUNDO ---
-if st.session_state.mundo == "NFe":
-    cor_tema = "#FF69B4"  # Rosa Rihanna
-    cor_fundo_card = "rgba(255, 105, 180, 0.1)"
-    label_mundo = "💎 MODO MATRIZ FISCAL (NF-e)"
-    btn_nfe_css = "border: 3px solid #FF69B4 !important; background-color: #FFF0F5 !important; color: #FF69B4 !important;"
-    btn_nfse_css = "border: 1px solid #DEE2E6 !important; background-color: #FFFFFF !important; color: #6C757D !important;"
-else:
-    cor_tema = "#C71585"  # Rosa Choque/Médio
-    cor_fundo_card = "rgba(199, 21, 133, 0.1)"
-    label_mundo = "📑 MODO AUDITORIA FISCAL (NFS-e)"
-    btn_nfse_css = "border: 3px solid #C71585 !important; background-color: #FFF0F5 !important; color: #C71585 !important;"
-    btn_nfe_css = "border: 1px solid #DEE2E6 !important; background-color: #FFFFFF !important; color: #6C757D !important;"
-
-# --- 3. CSS UNIFICADO E DINÂMICO ---
+# --- 2. CSS ESTILO DIVISOR DE CADERNO ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
     
     header, [data-testid="stHeader"] {{ display: none !important; }}
     
-    .stApp {{ background-color: #F8F9FA !important; }}
+    /* Fundo original preservado */
+    .stApp {{ background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }}
 
-    /* Banner de Identificação do Mundo */
-    .mundo-banner {{
-        background-color: {cor_tema};
-        color: white;
-        text-align: center;
-        padding: 10px;
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 800;
-        font-size: 1.2rem;
-        border-radius: 0 0 20px 20px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }}
-    
-    /* Botões do Porteiro */
-    div[data-testid="column"]:nth-of-type(2) button {{ {btn_nfe_css} }}
-    div[data-testid="column"]:nth-of-type(4) button {{ {btn_nfse_css} }}
-
+    /* Estilo dos Botões como Abas de Caderno */
     .stButton > button {{
-        border-radius: 15px !important; 
+        border-radius: 15px 15px 0 0 !important; /* Arredondado só em cima */
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 800 !important; 
-        height: 55px !important; 
+        height: 50px !important; 
         text-transform: uppercase; 
         width: 100%;
-        transition: all 0.2s ease !important;
+        margin-bottom: -2px !important; /* Encosta na linha */
+        transition: all 0.3s ease !important;
+        border: 1px solid #DEE2E6 !important;
+        background-color: rgba(255, 255, 255, 0.5) !important;
+        color: #6C757D !important;
     }}
 
-    .instrucoes-card {{ 
-        background-color: white; 
-        border-radius: 15px; 
-        padding: 20px; 
-        border-left: 8px solid {cor_tema}; 
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        margin-bottom: 20px; 
-        min-height: 250px; 
+    /* Aba Ativa (Mundo Selecionado) */
+    .aba-ativa > div > button {{
+        background-color: #FFFFFF !important;
+        color: #FF69B4 !important;
+        border: 1px solid #FF69B4 !important;
+        border-bottom: 2px solid #FFFFFF !important; /* Apaga a linha embaixo */
+        box-shadow: 0 -4px 10px rgba(255, 105, 180, 0.1) !important;
+        z-index: 10;
     }}
-
-    h1, h2, h3 {{ font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: {cor_tema} !important; }}
     
-    [data-testid="stFileUploader"] {{ border: 2px dashed {cor_tema} !important; border-radius: 20px !important; background: #FFFFFF !important; }}
-    section[data-testid="stFileUploader"] button, div.stDownloadButton > button {{ background-color: {cor_tema} !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important; }}
-    [data-testid="stSidebar"] {{ background-color: #FFFFFF !important; border-right: 1px solid #DEE2E6 !important; min-width: 400px !important; }}
+    .stButton > button:hover {{ 
+        color: #FF69B4 !important; 
+    }}
+
+    /* Linha Divisora (Folha de Caderno) */
+    .linha-caderno {{
+        border-bottom: 2px solid #FF69B4;
+        margin-top: -2px;
+        margin-bottom: 30px;
+        width: 100%;
+    }}
+
+    .instrucoes-card {{ background-color: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 20px; border-left: 5px solid #FF69B4; margin-bottom: 20px; min-height: 250px; }}
+    h1, h2, h3 {{ font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #FF69B4 !important; text-align: center; }}
+    
+    [data-testid="stFileUploader"] {{ border: 2px dashed #FF69B4 !important; border-radius: 20px !important; background: #FFFFFF !important; padding: 20px !important; }}
+    section[data-testid="stFileUploader"] button, div.stDownloadButton > button {{ background-color: #FF69B4 !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important; }}
+    [data-testid="stSidebar"] {{ background-color: #FFFFFF !important; border-right: 1px solid #FFDEEF !important; min-width: 400px !important; }}
     </style>
-    
-    <div class="mundo-banner">{label_mundo}</div>
 """, unsafe_allow_html=True)
 
-# --- 4. SISTEMA DE NAVEGAÇÃO ---
-_, col_btn1, espaco, col_btn2, _ = st.columns([2, 1, 0.1, 1, 2])
+# --- 3. SISTEMA DE NAVEGAÇÃO (ABAS DE CADERNO) ---
+_, col_btn1, col_btn2, _ = st.columns([1.5, 1, 1, 1.5])
 
 with col_btn1:
+    if st.session_state.mundo == "NFe":
+        st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
     if st.button("💎 PORTAL TAX NF-e"):
         st.session_state.mundo = "NFe"
         st.rerun()
+    if st.session_state.mundo == "NFe":
+        st.markdown('</div>', unsafe_allow_html=True)
 
 with col_btn2:
+    if st.session_state.mundo == "NFSe":
+        st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
     if st.button("📑 PORTAL TAX NFS-e"):
         st.session_state.mundo = "NFSe"
         st.rerun()
+    if st.session_state.mundo == "NFSe":
+        st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown("---")
+# Linha que conecta as abas
+st.markdown('<div class="linha-caderno"></div>', unsafe_allow_html=True)
 
 # ==========================================
 # MUNDO 1: NF-e (MATRIZ FISCAL)
 # ==========================================
 if st.session_state.mundo == "NFe":
     st.markdown("<style>[data-testid='stSidebar'] { display: block !important; }</style>", unsafe_allow_html=True)
-    st.markdown(f"<h1>💎 MATRIZ FISCAL</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>💎 MATRIZ FISCAL</h1>", unsafe_allow_html=True)
     
     m_col1, m_col2 = st.columns(2)
     with m_col1:
@@ -111,6 +105,7 @@ if st.session_state.mundo == "NFe":
         st.markdown('<div class="instrucoes-card"><h3>🎯 Dados Obtidos</h3><ul><li><b>Mapeamento Total:</b> 34 colunas fiscais extraídas.</li><li><b>Reforma 2026:</b> Tags de IBS, CBS e CLClass incluídas.</li><li><b>Inteligência:</b> Separação automática entre Entradas e Saídas.</li></ul></div>', unsafe_allow_html=True)
 
     if 'lib_nfe' not in st.session_state: st.session_state.lib_nfe = False
+    
     with st.sidebar:
         st.markdown("### 🔍 Configuração")
         cnpj = st.text_input("CNPJ DO CLIENTE", placeholder="00.000.000/0001-00")
@@ -123,10 +118,11 @@ if st.session_state.mundo == "NFe":
             st.rerun()
 
     if st.session_state.lib_nfe:
+        st.info(f"🏢 Empresa Liberada: {cnpj_l}")
         f_nfe = st.file_uploader("Arraste seus arquivos XML ou ZIP aqui", type=["xml", "zip"], accept_multiple_files=True, key="up_nfe")
         if st.button("🚀 PROCESSAR MATRIZ FISCAL"):
             dados_nfe = []
-            with st.spinner("Processando Matriz..."):
+            with st.spinner("💎 Rihanna Style: Brilhando nos dados..."):
                 for f in f_nfe:
                     if f.name.endswith('.zip'):
                         with zipfile.ZipFile(f) as z:
@@ -136,17 +132,18 @@ if st.session_state.mundo == "NFe":
             if dados_nfe:
                 df_nfe = pd.DataFrame(dados_nfe)
                 out_nfe = io.BytesIO()
-                df_nfe.to_excel(out_nfe, index=False)
+                with pd.ExcelWriter(out_nfe, engine='xlsxwriter') as writer:
+                    df_nfe.to_excel(writer, index=False)
                 st.success(f"✨ Sucesso! {len(df_nfe)} itens organizados.")
                 st.download_button("📥 BAIXAR MATRIZ DIAMANTE", out_nfe.getvalue(), f"matriz_{cnpj_l}.xlsx")
-    else: st.warning("👈 Insira o CNPJ na lateral.")
+    else: st.warning("👈 Insira o CNPJ na barra lateral e clique em 'Liberar Operação' para começar.")
 
 # ==========================================
 # MUNDO 2: NFS-e (AUDITORIA FISCAL)
 # ==========================================
 else:
     st.markdown("<style>[data-testid='stSidebar'], [data-testid='stSidebarCollapsedControl'] { display: none !important; }</style>", unsafe_allow_html=True)
-    st.markdown(f"<h1>PORTAL TAX NFS-e - AUDITORIA FISCAL</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>PORTAL TAX NFS-e - AUDITORIA FISCAL</h1>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
@@ -155,9 +152,10 @@ else:
         st.markdown('<div class="instrucoes-card"><h3>📊 O que será obtido?</h3><ul><li><b>Leitura Universal:</b> Dados de centenas de prefeituras consolidados.</li><li><b>Gestão de ISS:</b> Separação entre ISS Próprio e Retido.</li><li><b>Impostos Federais:</b> Captura de PIS, COFINS, CSLL e IRRF.</li><li><b>Diagnóstico:</b> Identificação de notas com retenções pendentes.</li></ul></div>', unsafe_allow_html=True)
 
     f_nfse = st.file_uploader("Arraste os arquivos XML ou ZIP aqui", type=["xml", "zip"], accept_multiple_files=True, key="up_nfse")
+    
     if f_nfse and st.button("🚀 INICIAR AUDITORIA FISCAL"):
         dados_nfse = []
-        with st.spinner("Auditando NFS-e..."):
+        with st.spinner("Processando..."):
             for f in f_nfse:
                 if f.name.endswith('.zip'):
                     with zipfile.ZipFile(f) as z:
@@ -171,12 +169,14 @@ else:
         
         if dados_nfse:
             df_nfse = pd.DataFrame(dados_nfse)
-            # Reuso da lógica de processamento numérico
-            c_v = ['Vlr_Bruto', 'Vlr_Liquido', 'ISS_Valor', 'Ret_ISS', 'Ret_PIS', 'Ret_COFINS', 'Ret_CSLL', 'Ret_IRRF']
-            for c in c_v: df_nfse[c] = pd.to_numeric(df_nfse[c], errors='coerce').fillna(0.0)
+            cols_fin = ['Vlr_Bruto', 'Vlr_Liquido', 'ISS_Valor', 'Ret_ISS', 'Ret_PIS', 'Ret_COFINS', 'Ret_CSLL', 'Ret_IRRF']
+            for c in cols_fin: df_nfse[c] = pd.to_numeric(df_nfse[c], errors='coerce').fillna(0.0)
             df_nfse['Diagnostico'] = df_nfse.apply(lambda r: "⚠️ Divergência!" if abs(r['Vlr_Bruto'] - r['Vlr_Liquido']) > 0.01 else "✅", axis=1)
+            
             st.success(f"✅ {len(df_nfse)} notas processadas!")
             st.dataframe(df_nfse)
+            
             out_nfse = io.BytesIO()
-            df_nfse.to_excel(out_nfse, index=False)
+            with pd.ExcelWriter(out_nfse, engine='xlsxwriter') as writer:
+                df_nfse.to_excel(writer, index=False, sheet_name='PortalServTax')
             st.download_button("📥 BAIXAR EXCEL AJUSTADO", out_nfse.getvalue(), "portal_servtax_auditoria.xlsx")
