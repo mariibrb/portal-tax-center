@@ -11,7 +11,7 @@ st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wid
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. CSS: ABAS DE CADERNO E LINHA CONECTORA ---
+# --- 2. CSS: ABAS DE CADERNO COM SETA ANCORADA (SEM ERRO DE ALINHAMENTO) ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
@@ -35,32 +35,41 @@ st.markdown(f"""
         color: #6C757D !important;
     }}
 
-    /* ABA ATIVA: ROSA COM TEXTO BRANCO */
+    /* ABA ATIVA: ROSA COM SETINHA ANCORADA VIA CSS */
     .aba-ativa > div > button {{
         background-color: #FF69B4 !important;
         color: white !important;
         border: 2px solid #FF69B4 !important;
         box-shadow: 0 -4px 15px rgba(255, 105, 180, 0.3) !important;
-        position: relative !important;
+        position: relative !important; /* Essencial para a ancoragem */
         z-index: 10;
     }}
 
-    /* ESTILO DA SETINHA CENTRALIZADA */
-    .setinha-v {{
-        text-align: center;
-        margin-top: -12px;
-        margin-bottom: 20px;
-        color: #FF69B4;
-        font-size: 35px;
-        line-height: 1;
-        font-family: Arial, sans-serif;
+    /* A SETA (TRIÂNGULO) ANCORADA NO CENTRO DO BOTÃO ATIVO */
+    .aba-ativa > div > button::after {{
+        content: '';
+        position: absolute;
+        bottom: -18px; /* Ajuste fino da altura */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 15px solid #FF69B4;
+        z-index: 20;
+    }}
+    
+    .stButton > button:hover {{ 
+        border-color: #FF69B4 !important;
+        color: #FF69B4 !important;
     }}
 
     /* LINHA DO CADERNO */
     .linha-caderno {{
         border-bottom: 4px solid #FF69B4;
-        margin-top: -4px;
-        margin-bottom: 40px;
+        margin-top: -2px;
+        margin-bottom: 50px;
         width: 100%;
     }}
 
@@ -73,8 +82,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # --- 3. SISTEMA DE NAVEGAÇÃO ---
-# Criamos 5 colunas: [Lateral, Botão1, Espaço Pequeno, Botão2, Lateral]
-# O porteiro fica no centro
+# Mantendo os botões próximos no centro
 _, col_btn1, espaco, col_btn2, _ = st.columns([1.5, 1, 0.1, 1, 1.5])
 
 with col_btn1:
@@ -95,13 +103,7 @@ with col_btn2:
     if st.session_state.mundo == "NFSe":
         st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 4. A SETA CENTRALIZADA (REPETE A MESMA GRADE DE COLUNAS) ---
-c1, c2, c3, c4, c5 = st.columns([1.5, 1, 0.1, 1, 1.5])
-if st.session_state.mundo == "NFe":
-    with c2: st.markdown('<div class="setinha-v">▼</div>', unsafe_allow_html=True)
-else:
-    with c4: st.markdown('<div class="setinha-v">▼</div>', unsafe_allow_html=True)
-
+# Linha que conecta tudo
 st.markdown('<div class="linha-caderno"></div>', unsafe_allow_html=True)
 
 # ==========================================
