@@ -5,21 +5,37 @@ import zipfile
 import motor_nfe
 import motor_nfse
 
-# --- 1. CONFIGURAÇÃO (DEVE SER O PRIMEIRO COMANDO) ---
+# --- 1. CONFIGURAÇÃO ---
 st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wide")
 
-# --- 2. ESTILO PREMIUM UNIFICADO ---
-st.markdown("""
+# Inicializa o estado do mundo
+if "mundo" not in st.session_state: 
+    st.session_state.mundo = "NFe"
+
+# --- 2. CSS DINÂMICO (CORES POR MUNDO) ---
+# Definimos as cores dependendo do mundo selecionado
+if st.session_state.mundo == "NFe":
+    bg_gradient = "radial-gradient(circle at top right, #FFDEEF 0%, #FDFCFD 100%)" # Rosa Claro/Pérola
+    btn_nfe_style = "background-color: #FF69B4 !important; color: white !important; border: 2px solid #FFFFFF !important; box-shadow: 0 4px 15px rgba(255,105,180,0.4) !important;"
+    btn_nfse_style = "background-color: #FFFFFF !important; color: #6C757D !important;"
+else:
+    bg_gradient = "radial-gradient(circle at top right, #FFB6C1 0%, #FFDEEF 100%)" # Rosa mais Escuro/Intenso
+    btn_nfse_style = "background-color: #FF69B4 !important; color: white !important; border: 2px solid #FFFFFF !important; box-shadow: 0 4px 15px rgba(255,105,180,0.4) !important;"
+    btn_nfe_style = "background-color: #FFFFFF !important; color: #6C757D !important;"
+
+st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
-    header, [data-testid="stHeader"] { display: none !important; }
-    .stApp { background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }
     
-    /* Estilo Base dos Botões do Porteiro */
-    .stButton > button {
-        color: #6C757D !important; 
-        background-color: #FFFFFF !important; 
-        border: 1px solid #DEE2E6 !important;
+    header, [data-testid="stHeader"] {{ display: none !important; }}
+    
+    .stApp {{ 
+        background: {bg_gradient} !important; 
+        transition: background 0.5s ease-in-out !important;
+    }}
+    
+    /* Botões do Porteiro */
+    .stButton > button {{
         border-radius: 15px !important; 
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 800 !important; 
@@ -27,67 +43,33 @@ st.markdown("""
         text-transform: uppercase; 
         width: 100%;
         transition: all 0.3s ease !important;
-    }
+    }}
 
-    /* Estilo para o Mundo Ativo (Injetado via Python) */
-    .btn-ativo > div > button {
-        background-color: #FF69B4 !important;
-        color: white !important;
-        border: 2px solid #FFFFFF !important;
-        box-shadow: 0 8px 15px rgba(255,105,180,0.3) !important;
-    }
+    /* Injeção de estilo nos botões via ID de posição (hack para não empurrar layout) */
+    div[data-testid="column"]:nth-of-type(2) button {{ {btn_nfe_style} }}
+    div[data-testid="column"]:nth-of-type(4) button {{ {btn_nfse_style} }}
     
-    .stButton > button:hover { 
-        border-color: #FF69B4 !important; 
-        color: #FF69B4 !important; 
-        transform: translateY(-2px); 
-    }
+    .instrucoes-card {{ background-color: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 20px; border-left: 5px solid #FF69B4; margin-bottom: 20px; min-height: 250px; }}
+    h1, h2, h3 {{ font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #FF69B4 !important; text-align: center; }}
     
-    .instrucoes-card { background-color: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 20px; border-left: 5px solid #FF69B4; margin-bottom: 20px; min-height: 250px; }
-    h1, h2, h3 { font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #FF69B4 !important; text-align: center; }
-    
-    [data-testid="stFileUploader"] { 
-        border: 2px dashed #FF69B4 !important; 
-        border-radius: 20px !important; 
-        background: #FFFFFF !important; 
-        padding: 20px !important; 
-    }
-    
-    section[data-testid="stFileUploader"] button, div.stDownloadButton > button { 
-        background-color: #FF69B4 !important; 
-        color: white !important; 
-        font-weight: 700 !important; 
-        border-radius: 15px !important; 
-    }
-    
-    [data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #FFDEEF !important; min-width: 400px !important; }
+    [data-testid="stFileUploader"] {{ border: 2px dashed #FF69B4 !important; border-radius: 20px !important; background: #FFFFFF !important; padding: 20px !important; }}
+    section[data-testid="stFileUploader"] button, div.stDownloadButton > button {{ background-color: #FF69B4 !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important; }}
+    [data-testid="stSidebar"] {{ background-color: #FFFFFF !important; border-right: 1px solid #FFDEEF !important; min-width: 400px !important; }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SISTEMA DE NAVEGAÇÃO COM DESTAQUE ATIVO ---
-if "mundo" not in st.session_state: st.session_state.mundo = "NFe"
-
+# --- 3. SISTEMA DE NAVEGAÇÃO ---
 _, col_btn1, espaco, col_btn2, _ = st.columns([2, 1, 0.1, 1, 2])
 
-# Lógica para aplicar a classe 'btn-ativo' apenas no botão do mundo atual
 with col_btn1:
-    container_nfe = st.container()
-    if st.session_state.mundo == "NFe":
-        st.markdown('<div class="btn-ativo">', unsafe_allow_html=True)
-    if st.button("💎 PORTAL TAX NF-e"):
+    if st.button("💎 PORTAL TAX NF-e", key="btn_nfe"):
         st.session_state.mundo = "NFe"
         st.rerun()
-    if st.session_state.mundo == "NFe":
-        st.markdown('</div>', unsafe_allow_html=True)
 
 with col_btn2:
-    if st.session_state.mundo == "NFSe":
-        st.markdown('<div class="btn-ativo">', unsafe_allow_html=True)
-    if st.button("📑 PORTAL TAX NFS-e"):
+    if st.button("📑 PORTAL TAX NFS-e", key="btn_nfse"):
         st.session_state.mundo = "NFSe"
         st.rerun()
-    if st.session_state.mundo == "NFSe":
-        st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -100,25 +82,9 @@ if st.session_state.mundo == "NFe":
     
     m_col1, m_col2 = st.columns(2)
     with m_col1:
-        st.markdown("""
-        <div class="instrucoes-card">
-            <h3>📖 Manual de Uso</h3>
-            <ol>
-                <li><b>Configuração:</b> Informe o CNPJ na lateral para liberar o painel.</li>
-                <li><b>Upload:</b> Arraste arquivos XML ou ZIP para o campo rosa.</li>
-                <li><b>Processamento:</b> Extração automática das 34 colunas.</li>
-            </ol>
-        </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="instrucoes-card"><h3>📖 Manual de Uso</h3><ol><li><b>Configuração:</b> Informe o CNPJ na lateral para liberar o painel.</li><li><b>Upload:</b> Arraste arquivos XML ou ZIP para o campo rosa.</li><li><b>Processamento:</b> Extração automática das 34 colunas.</li></ol></div>', unsafe_allow_html=True)
     with m_col2:
-        st.markdown("""
-        <div class="instrucoes-card">
-            <h3>🎯 Dados Obtidos</h3>
-            <ul>
-                <li><b>Mapeamento Total:</b> 34 colunas fiscais extraídas.</li>
-                <li><b>Reforma 2026:</b> Tags de IBS, CBS e CLClass incluídas.</li>
-                <li><b>Inteligência:</b> Separação automática entre Entradas e Saídas.</li>
-            </ul>
-        </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="instrucoes-card"><h3>🎯 Dados Obtidos</h3><ul><li><b>Mapeamento Total:</b> 34 colunas fiscais extraídas.</li><li><b>Reforma 2026:</b> Tags de IBS, CBS e CLClass incluídas.</li><li><b>Inteligência:</b> Separação automática entre Entradas e Saídas.</li></ul></div>', unsafe_allow_html=True)
 
     if 'lib_nfe' not in st.session_state: st.session_state.lib_nfe = False
     
@@ -163,27 +129,9 @@ else:
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("""
-        <div class="instrucoes-card">
-            <h3>📖 Passo a Passo</h3>
-            <ol>
-                <li><b>Upload:</b> Arraste arquivos <b>.XML</b> ou <b>.ZIP</b> abaixo.</li>
-                <li><b>Ação:</b> Clique em <b>"INICIAR AUDITORIA"</b>.</li>
-                <li><b>Conferência:</b> Analise o <b>Diagnóstico</b> de divergências.</li>
-                <li><b>Saída:</b> Baixe o Excel final para auditoria.</li>
-            </ol>
-        </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="instrucoes-card"><h3>📖 Passo a Passo</h3><ol><li><b>Upload:</b> Arraste arquivos <b>.XML</b> ou <b>.ZIP</b> abaixo.</li><li><b>Ação:</b> Clique em <b>"INICIAR AUDITORIA"</b>.</li><li><b>Conferência:</b> Analise o <b>Diagnóstico</b> de divergências.</li><li><b>Saída:</b> Baixe o Excel final para auditoria.</li></ol></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown("""
-        <div class="instrucoes-card">
-            <h3>📊 O que será obtido?</h3>
-            <ul>
-                <li><b>Leitura Universal:</b> Dados de centenas de prefeituras consolidados.</li>
-                <li><b>Gestão de ISS:</b> Separação entre ISS Próprio e Retido.</li>
-                <li><b>Impostos Federais:</b> Captura de PIS, COFINS, CSLL e IRRF.</li>
-                <li><b>Diagnóstico:</b> Identificação de notas com retenções pendentes.</li>
-            </ul>
-        </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="instrucoes-card"><h3>📊 O que será obtido?</h3><ul><li><b>Leitura Universal:</b> Dados de centenas de prefeituras consolidados.</li><li><b>Gestão de ISS:</b> Separação entre ISS Próprio e Retido.</li><li><b>Impostos Federais:</b> Captura de PIS, COFINS, CSLL e IRRF.</li><li><b>Diagnóstico:</b> Identificação de notas com retenções pendentes.</li></ul></div>', unsafe_allow_html=True)
 
     f_nfse = st.file_uploader("Arraste os arquivos XML ou ZIP aqui", type=["xml", "zip"], accept_multiple_files=True, key="up_nfse")
     
@@ -204,7 +152,7 @@ else:
         if dados_nfse:
             df_nfse = pd.DataFrame(dados_nfse)
             cols_fin = ['Vlr_Bruto', 'Vlr_Liquido', 'ISS_Valor', 'Ret_ISS', 'Ret_PIS', 'Ret_COFINS', 'Ret_CSLL', 'Ret_IRRF']
-            for c in cols_v: df_nfse[c] = pd.to_numeric(df_nfse[c], errors='coerce').fillna(0.0)
+            for c in cols_fin: df_nfse[c] = pd.to_numeric(df_nfse[c], errors='coerce').fillna(0.0)
             df_nfse['Diagnostico'] = df_nfse.apply(lambda r: "⚠️ Divergência!" if abs(r['Vlr_Bruto'] - r['Vlr_Liquido']) > 0.01 else "✅", axis=1)
             
             st.success(f"✅ {len(df_nfse)} notas processadas!")
