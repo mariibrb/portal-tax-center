@@ -5,13 +5,13 @@ import zipfile
 import motor_nfe
 import motor_nfse
 
-# --- 1. CONFIGURAÇÃO (DEVE SER O PRIMEIRO COMANDO) ---
+# --- 1. CONFIGURAÇÃO ---
 st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wide")
 
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. CSS: ABAS DE CADERNO COM SETA ANCORADA (SEM ERRO DE ALINHAMENTO) ---
+# --- 2. CSS: ABAS E SETA INDEPENDENTE ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
@@ -29,47 +29,38 @@ st.markdown(f"""
         text-transform: uppercase; 
         width: 100%;
         margin-bottom: -2px !important;
-        transition: all 0.2s ease !important;
         border: 2px solid #DEE2E6 !important;
         background-color: #F8F9FA !important;
         color: #6C757D !important;
+        transition: all 0.2s ease !important;
     }}
 
-    /* ABA ATIVA: ROSA COM SETINHA ANCORADA VIA CSS */
+    /* ABA SELECIONADA */
     .aba-ativa > div > button {{
         background-color: #FF69B4 !important;
         color: white !important;
         border: 2px solid #FF69B4 !important;
         box-shadow: 0 -4px 15px rgba(255, 105, 180, 0.3) !important;
-        position: relative !important; /* Essencial para a ancoragem */
-        z-index: 10;
     }}
 
-    /* A SETA (TRIÂNGULO) ANCORADA NO CENTRO DO BOTÃO ATIVO */
-    .aba-ativa > div > button::after {{
-        content: '';
-        position: absolute;
-        bottom: -18px; /* Ajuste fino da altura */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
-        border-top: 15px solid #FF69B4;
-        z-index: 20;
-    }}
-    
-    .stButton > button:hover {{ 
-        border-color: #FF69B4 !important;
-        color: #FF69B4 !important;
+    /* ESTILO DA SETA (DIV SEPARADA) */
+    .seta-indicadora {{
+        color: #FF69B4;
+        font-size: 30px;
+        text-align: center;
+        width: 100%;
+        margin-top: -20px; /* Puxa a seta para cima da linha */
+        margin-bottom: 10px;
+        line-height: 1;
+        font-family: Arial, sans-serif;
+        text-shadow: 0px 2px 5px rgba(0,0,0,0.1);
     }}
 
     /* LINHA DO CADERNO */
     .linha-caderno {{
         border-bottom: 4px solid #FF69B4;
         margin-top: -2px;
-        margin-bottom: 50px;
+        margin-bottom: 40px;
         width: 100%;
     }}
 
@@ -82,28 +73,30 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # --- 3. SISTEMA DE NAVEGAÇÃO ---
-# Mantendo os botões próximos no centro
+# Mantemos os botões próximos
 _, col_btn1, espaco, col_btn2, _ = st.columns([1.5, 1, 0.1, 1, 1.5])
 
 with col_btn1:
-    if st.session_state.mundo == "NFe":
-        st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
+    if st.session_state.mundo == "NFe": st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
     if st.button("💎 PORTAL TAX NF-e", key="nfe_btn"):
         st.session_state.mundo = "NFe"
         st.rerun()
-    if st.session_state.mundo == "NFe":
-        st.markdown('</div>', unsafe_allow_html=True)
+    if st.session_state.mundo == "NFe": st.markdown('</div>', unsafe_allow_html=True)
 
 with col_btn2:
-    if st.session_state.mundo == "NFSe":
-        st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
+    if st.session_state.mundo == "NFSe": st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
     if st.button("📑 PORTAL TAX NFS-e", key="nfse_btn"):
         st.session_state.mundo = "NFSe"
         st.rerun()
-    if st.session_state.mundo == "NFSe":
-        st.markdown('</div>', unsafe_allow_html=True)
+    if st.session_state.mundo == "NFSe": st.markdown('</div>', unsafe_allow_html=True)
 
-# Linha que conecta tudo
+# --- 4. A SETA (REPETINDO A MESMA LÓGICA DE COLUNAS PARA ALINHAR) ---
+_, s1, s2, s3, _ = st.columns([1.5, 1, 0.1, 1, 1.5])
+if st.session_state.mundo == "NFe":
+    with s1: st.markdown('<div class="seta-indicadora">▼</div>', unsafe_allow_html=True)
+else:
+    with s3: st.markdown('<div class="seta-indicadora">▼</div>', unsafe_allow_html=True)
+
 st.markdown('<div class="linha-caderno"></div>', unsafe_allow_html=True)
 
 # ==========================================
@@ -124,9 +117,7 @@ if st.session_state.mundo == "NFe":
         st.markdown("### 🔍 Configuração")
         cnpj = st.text_input("CNPJ DO CLIENTE", placeholder="00.000.000/0001-00")
         cnpj_l = "".join(filter(str.isdigit, cnpj))
-        if len(cnpj_l) == 14:
-            if st.button("✅ LIBERAR OPERAÇÃO"): st.session_state.lib_nfe = True
-        st.divider()
+        if len(cnpj_l) == 14 and st.button("✅ LIBERAR OPERAÇÃO"): st.session_state.lib_nfe = True
         if st.button("🗑️ RESETAR SISTEMA"):
             st.session_state.lib_nfe = False
             st.rerun()
