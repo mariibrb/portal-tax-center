@@ -15,7 +15,7 @@ st.markdown("""
     header, [data-testid="stHeader"] { display: none !important; }
     .stApp { background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }
     
-    /* Botões do Porteiro - Ajuste de Design */
+    /* Estilo Base dos Botões do Porteiro */
     .stButton > button {
         color: #6C757D !important; 
         background-color: #FFFFFF !important; 
@@ -26,15 +26,21 @@ st.markdown("""
         height: 55px !important; 
         text-transform: uppercase; 
         width: 100%;
-        transition: all 0.4s ease !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    /* Estilo para o Mundo Ativo (Injetado via Python) */
+    .btn-ativo > div > button {
+        background-color: #FF69B4 !important;
+        color: white !important;
+        border: 2px solid #FFFFFF !important;
+        box-shadow: 0 8px 15px rgba(255,105,180,0.3) !important;
     }
     
     .stButton > button:hover { 
         border-color: #FF69B4 !important; 
         color: #FF69B4 !important; 
-        transform: translateY(-3px); 
-        box-shadow: 0 8px 15px rgba(255,105,180,0.1) !important;
+        transform: translateY(-2px); 
     }
     
     .instrucoes-card { background-color: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 20px; border-left: 5px solid #FF69B4; margin-bottom: 20px; min-height: 250px; }
@@ -58,22 +64,30 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SISTEMA DE NAVEGAÇÃO CENTRALIZADO ---
+# --- 3. SISTEMA DE NAVEGAÇÃO COM DESTAQUE ATIVO ---
 if "mundo" not in st.session_state: st.session_state.mundo = "NFe"
 
-# Criamos uma estrutura de 5 colunas onde as 3 centrais seguram os botões e o espaço entre eles
-# Isso garante que eles fiquem "juntos" no centro, sem estarem espalhados nas pontas
 _, col_btn1, espaco, col_btn2, _ = st.columns([2, 1, 0.1, 1, 2])
 
+# Lógica para aplicar a classe 'btn-ativo' apenas no botão do mundo atual
 with col_btn1:
+    container_nfe = st.container()
+    if st.session_state.mundo == "NFe":
+        st.markdown('<div class="btn-ativo">', unsafe_allow_html=True)
     if st.button("💎 PORTAL TAX NF-e"):
         st.session_state.mundo = "NFe"
         st.rerun()
+    if st.session_state.mundo == "NFe":
+        st.markdown('</div>', unsafe_allow_html=True)
 
 with col_btn2:
+    if st.session_state.mundo == "NFSe":
+        st.markdown('<div class="btn-ativo">', unsafe_allow_html=True)
     if st.button("📑 PORTAL TAX NFS-e"):
         st.session_state.mundo = "NFSe"
         st.rerun()
+    if st.session_state.mundo == "NFSe":
+        st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -190,7 +204,7 @@ else:
         if dados_nfse:
             df_nfse = pd.DataFrame(dados_nfse)
             cols_fin = ['Vlr_Bruto', 'Vlr_Liquido', 'ISS_Valor', 'Ret_ISS', 'Ret_PIS', 'Ret_COFINS', 'Ret_CSLL', 'Ret_IRRF']
-            for c in cols_fin: df_nfse[c] = pd.to_numeric(df_nfse[c], errors='coerce').fillna(0.0)
+            for c in cols_v: df_nfse[c] = pd.to_numeric(df_nfse[c], errors='coerce').fillna(0.0)
             df_nfse['Diagnostico'] = df_nfse.apply(lambda r: "⚠️ Divergência!" if abs(r['Vlr_Bruto'] - r['Vlr_Liquido']) > 0.01 else "✅", axis=1)
             
             st.success(f"✅ {len(df_nfse)} notas processadas!")
