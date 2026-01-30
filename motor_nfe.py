@@ -33,7 +33,6 @@ def ler_xml_nfe(content, dados_lista, cnpj_cliente):
             prod, imp = det.find('prod'), det.find('imposto')
             icms, ipi, pis, cof = det.find('.//ICMS'), det.find('.//IPI'), det.find('.//PIS'), det.find('.//COFINS')
             ibs, cbs = det.find('.//IBS'), det.find('.//CBS')
-            
             orig = buscar_tag('orig', icms)
             cst_p = buscar_tag('CST', icms) or buscar_tag('CSOSN', icms)
             
