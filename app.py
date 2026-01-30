@@ -11,7 +11,7 @@ st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wid
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. CSS: ABAS E SETA INDEPENDENTE ---
+# --- 2. CSS: ABAS DE CADERNO COM SETA REALMENTE ANCORADA ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
@@ -35,32 +35,40 @@ st.markdown(f"""
         transition: all 0.2s ease !important;
     }}
 
-    /* ABA SELECIONADA */
+    /* ABA ATIVA: FUNDO ROSA E TEXTO BRANCO */
     .aba-ativa > div > button {{
         background-color: #FF69B4 !important;
         color: white !important;
         border: 2px solid #FF69B4 !important;
         box-shadow: 0 -4px 15px rgba(255, 105, 180, 0.3) !important;
+        position: relative !important; /* NECESSÁRIO PARA A SETA ANCORAR */
     }}
 
-    /* ESTILO DA SETA (DIV SEPARADA) */
-    .seta-indicadora {{
-        color: #FF69B4;
-        font-size: 30px;
-        text-align: center;
-        width: 100%;
-        margin-top: -20px; /* Puxa a seta para cima da linha */
-        margin-bottom: 10px;
-        line-height: 1;
-        font-family: Arial, sans-serif;
-        text-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+    /* A SETA (TRIÂNGULO) - AGORA USANDO PSEUDO-ELEMENTO PARA NÃO DESALINHAR */
+    .aba-ativa > div > button::after {{
+        content: "";
+        position: absolute;
+        bottom: -15px; /* Ajuste para encostar na linha */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 15px solid #FF69B4; /* Cor da seta */
+        z-index: 1000;
+    }}
+    
+    .stButton > button:hover {{ 
+        border-color: #FF69B4 !important;
+        color: #FF69B4 !important;
     }}
 
     /* LINHA DO CADERNO */
     .linha-caderno {{
         border-bottom: 4px solid #FF69B4;
         margin-top: -2px;
-        margin-bottom: 40px;
+        margin-bottom: 50px;
         width: 100%;
     }}
 
@@ -73,8 +81,8 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # --- 3. SISTEMA DE NAVEGAÇÃO ---
-# Mantemos os botões próximos
-_, col_btn1, espaco, col_btn2, _ = st.columns([1.5, 1, 0.1, 1, 1.5])
+# Centralizando o Porteiro
+_, col_btn1, espaco, col_btn2, _ = st.columns([2, 1, 0.1, 1, 2])
 
 with col_btn1:
     if st.session_state.mundo == "NFe": st.markdown('<div class="aba-ativa">', unsafe_allow_html=True)
@@ -90,13 +98,7 @@ with col_btn2:
         st.rerun()
     if st.session_state.mundo == "NFSe": st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 4. A SETA (REPETINDO A MESMA LÓGICA DE COLUNAS PARA ALINHAR) ---
-_, s1, s2, s3, _ = st.columns([1.5, 1, 0.1, 1, 1.5])
-if st.session_state.mundo == "NFe":
-    with s1: st.markdown('<div class="seta-indicadora">▼</div>', unsafe_allow_html=True)
-else:
-    with s3: st.markdown('<div class="seta-indicadora">▼</div>', unsafe_allow_html=True)
-
+# Linha que conecta as abas ao conteúdo
 st.markdown('<div class="linha-caderno"></div>', unsafe_allow_html=True)
 
 # ==========================================
