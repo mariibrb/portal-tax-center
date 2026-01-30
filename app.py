@@ -13,12 +13,9 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
     
-    /* Remove o cabeçalho padrão do Streamlit */
     header, [data-testid="stHeader"] { display: none !important; }
-    
     .stApp { background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }
     
-    /* ESTILO DAS TABS */
     .stTabs [data-baseweb="tab"] {
         height: 60px; background-color: #FFFFFF !important; border-radius: 15px 15px 0px 0px !important;
         border: 1px solid #DEE2E6 !important; font-family: 'Montserrat', sans-serif !important;
@@ -26,22 +23,18 @@ st.markdown("""
     }
     .stTabs [aria-selected="true"] { background-color: #FF69B4 !important; color: white !important; border-color: #FF69B4 !important; }
     
-    /* SIDEBAR PADRÃO */
     [data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #FFDEEF !important; min-width: 350px !important; }
     
-    /* BOTÕES */
     div.stButton > button {
         color: #6C757D !important; background-color: #FFFFFF !important; border: 1px solid #DEE2E6 !important;
         border-radius: 15px !important; font-family: 'Montserrat', sans-serif !important;
-        font-weight: 800 !important; height: 60px !important; text-transform: uppercase;
-        width: 100%; transition: all 0.4s ease !important;
+        font-weight: 800 !important; height: 60px !important; text-transform: uppercase; width: 100%;
     }
     div.stButton > button:hover { transform: translateY(-5px) !important; border-color: #FF69B4 !important; color: #FF69B4 !important; }
     
-    /* UPLOADER E DOWNLOADER */
     [data-testid="stFileUploader"] { border: 2px dashed #FF69B4 !important; border-radius: 20px !important; background: #FFFFFF !important; padding: 20px !important; }
     section[data-testid="stFileUploader"] button, div.stDownloadButton > button {
-        background-color: #FF69B4 !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important; text-transform: uppercase; width: 100% !important;
+        background-color: #FF69B4 !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important;
     }
     
     h1, h2, h3 { font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #FF69B4 !important; text-align: center; }
@@ -49,21 +42,28 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- CONTROLE DE ESTADO DA SIDEBAR ---
+# Usamos uma variável de estado para saber em qual aba estamos e aplicar o CSS correto no topo
+if "aba_atual" not in st.session_state:
+    st.session_state.aba_atual = "NF-e"
+
+# Injeção de CSS Dinâmico Baseado no Estado
+if st.session_state.aba_atual == "NFS-e":
+    st.markdown("<style>[data-testid='stSidebar'], [data-testid='stSidebarCollapsedControl'] { display: none !important; }</style>", unsafe_allow_html=True)
+else:
+    st.markdown("<style>[data-testid='stSidebar'], [data-testid='stSidebarCollapsedControl'] { display: block !important; }</style>", unsafe_allow_html=True)
+
+
 # --- NAVEGAÇÃO POR ABAS ---
+# O segredo aqui é capturar a mudança de aba
 tab_nfe, tab_nfse = st.tabs(["💎 PORTAL TAX NF-e", "📑 PORTAL TAX NFS-e"])
 
 # ==========================================
-# ABA NF-e (A SIDEBAR DEVE APARECER AQUI)
+# ABA NF-e
 # ==========================================
 with tab_nfe:
-    # FORÇA A EXIBIÇÃO DA SIDEBAR
-    st.markdown("""
-        <style>
-            [data-testid="stSidebar"] { display: block !important; }
-            [data-testid="stSidebarCollapsedControl"] { display: block !important; }
-        </style>
-    """, unsafe_allow_html=True)
-
+    st.session_state.aba_atual = "NF-e"
+    
     st.markdown("<h1>💎 MATRIZ FISCAL NF-e</h1>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1: st.markdown('<div class="instrucoes-card"><h3>📖 Manual NF-e</h3><ol><li>Insira o CNPJ na lateral.</li><li>Arraste os arquivos.</li><li>Obtenha as 34 colunas.</li></ol></div>', unsafe_allow_html=True)
@@ -84,7 +84,7 @@ with tab_nfe:
 
     if st.session_state['lib_nfe']:
         st.info(f"🏢 Operando CNPJ: {cnpj_l}")
-        files = st.file_uploader("Arquivos NF-e (XML ou ZIP)", type=["xml", "zip"], accept_multiple_files=True, key="u_nfe")
+        files = st.file_uploader("Arquivos NF-e", type=["xml", "zip"], accept_multiple_files=True, key="u_nfe")
         if st.button("🚀 PROCESSAR MATRIZ NF-e"):
             res_nfe = []
             with st.spinner("Brilhando nos dados..."):
@@ -100,26 +100,24 @@ with tab_nfe:
                 df.to_excel(out, index=False, engine='xlsxwriter')
                 st.success(f"✨ {len(df)} itens processados!")
                 st.download_button("📥 BAIXAR MATRIZ DIAMANTE", out.getvalue(), f"matriz_{cnpj_l}.xlsx")
-    else: st.warning("👈 Insira o CNPJ na lateral para começar.")
+    else: st.warning("👈 Insira o CNPJ na lateral.")
 
 # ==========================================
-# ABA NFS-e (A SIDEBAR DEVE SUMIR AQUI)
+# ABA NFS-e
 # ==========================================
 with tab_nfse:
-    # FORÇA O OCULTAMENTO DA SIDEBAR
-    st.markdown("""
-        <style>
-            [data-testid="stSidebar"] { display: none !important; }
-            [data-testid="stSidebarCollapsedControl"] { display: none !important; }
-        </style>
-    """, unsafe_allow_html=True)
-    
+    st.session_state.aba_atual = "NFS-e"
+    # Forçamos um rerun imediato se a aba mudou para garantir que o CSS do topo seja aplicado
+    if st.session_state.aba_atual == "NFS-e" and st.session_state.get('last_aba') != "NFS-e":
+        st.session_state.last_aba = "NFS-e"
+        st.rerun()
+
     st.markdown("<h1>📑 PORTAL TAX NFS-e</h1>", unsafe_allow_html=True)
     c3, c4 = st.columns(2)
     with c3: st.markdown('<div class="instrucoes-card"><h3>📖 Manual NFS-e</h3><ol><li>Arraste os arquivos XML/ZIP.</li><li>Clique em Auditoria.</li><li>Analise o Diagnóstico.</li></ol></div>', unsafe_allow_html=True)
     with c4: st.markdown('<div class="instrucoes-card"><h3>📊 Diagnóstico</h3><ul><li>ISS Próprio vs Retido.</li><li>Retenções Federais.</li><li>Universalidade Prefeituras.</li></ul></div>', unsafe_allow_html=True)
     
-    files_s = st.file_uploader("Arquivos NFS-e (XML ou ZIP)", type=["xml", "zip"], accept_multiple_files=True, key="u_nfse")
+    files_s = st.file_uploader("Arquivos NFS-e", type=["xml", "zip"], accept_multiple_files=True, key="u_nfse")
     if files_s and st.button("🚀 INICIAR AUDITORIA NFS-e"):
         res_nfse = []
         with st.spinner("Auditando..."):
@@ -138,10 +136,11 @@ with tab_nfse:
             cols_v = ['Vlr_Bruto', 'Vlr_Liquido', 'ISS_Valor', 'Ret_ISS', 'Ret_PIS', 'Ret_COFINS', 'Ret_CSLL', 'Ret_IRRF']
             for c in cols_v: df_s[c] = pd.to_numeric(df_s[c], errors='coerce').fillna(0.0)
             df_s['Diagnostico'] = df_s.apply(lambda r: "⚠️ Divergência!" if abs(r['Vlr_Bruto'] - r['Vlr_Liquido']) > 0.01 else "✅", axis=1)
-            
-            st.success(f"✅ {len(df_s)} notas auditadas!")
             st.dataframe(df_s)
-            
             out_s = io.BytesIO()
             df_s.to_excel(out_s, index=False)
             st.download_button("📥 BAIXAR AUDITORIA EXCEL", out_s.getvalue(), "auditoria_nfse.xlsx")
+
+# Limpeza de estado para quando voltar para NF-e
+if st.session_state.aba_atual == "NF-e":
+    st.session_state.last_aba = "NF-e"
