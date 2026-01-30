@@ -5,13 +5,13 @@ import zipfile
 import motor_nfe
 import motor_nfse
 
-# --- 1. CONFIGURAÇÃO ---
+# --- 1. CONFIGURAÇÃO (DEVE SER O PRIMEIRO COMANDO) ---
 st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wide")
 
 if "mundo" not in st.session_state: 
     st.session_state.mundo = "NFe"
 
-# --- 2. CSS: ABAS DE CADERNO COLORIDAS + SETA ---
+# --- 2. CSS: ABAS DE CADERNO COLORIDAS + SETA INDICATIVA ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
@@ -25,7 +25,7 @@ st.markdown(f"""
         border-radius: 15px 15px 0 0 !important;
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 800 !important; 
-        height: 60px !important; 
+        height: 65px !important; 
         text-transform: uppercase; 
         width: 100%;
         margin-bottom: -2px !important;
@@ -35,41 +35,32 @@ st.markdown(f"""
         color: #6C757D !important;
     }}
 
-    /* ABA ATIVA: ROSA COM TEXTO BRANCO + CONTORNO */
+    /* ABA ATIVA: ROSA COM TEXTO BRANCO + CONTORNO FORTE */
     .aba-ativa > div > button {{
         background-color: #FF69B4 !important;
         color: white !important;
-        border: 2px solid #FF69B4 !important;
-        box-shadow: 0 -4px 15px rgba(255, 105, 180, 0.3) !important;
-        position: relative;
-        z-index: 10;
+        border: 3px solid #FF69B4 !important;
+        box-shadow: 0 -4px 15px rgba(255, 105, 180, 0.4) !important;
+        position: relative !important;
     }}
 
-    /* A SETA (TRIÂNGULO) LOGO ABAIXO DA ABA */
-    .aba-ativa > div > button::after {{
-        content: '';
-        position: absolute;
-        bottom: -20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
-        border-top: 15px solid #FF69B4;
-        z-index: 20;
-    }}
-    
-    .stButton > button:hover {{ 
-        border-color: #FF69B4 !important;
-        color: #FF69B4 !important;
+    /* A SETA (TRIÂNGULO) LOGO ABAIXO DA ABA - USANDO SVG PARA GARANTIR VISIBILIDADE */
+    .setinha-container {{
+        text-align: center;
+        margin-top: -15px;
+        margin-bottom: 25px;
+        color: #FF69B4;
+        font-size: 30px;
+        line-height: 1;
+        z-index: 100;
+        position: relative;
     }}
 
     /* LINHA DIVISORA QUE CONECTA COM A ABA */
     .linha-caderno {{
-        border-bottom: 3px solid #FF69B4;
-        margin-top: -2px;
-        margin-bottom: 50px;
+        border-bottom: 4px solid #FF69B4;
+        margin-top: -4px;
+        margin-bottom: 40px;
         width: 100%;
     }}
 
@@ -102,6 +93,13 @@ with col_btn2:
     if st.session_state.mundo == "NFSe":
         st.markdown('</div>', unsafe_allow_html=True)
 
+# Mostra a setinha abaixo da aba selecionada
+c1, c2, c3, c4, c5 = st.columns([1.5, 1, 0.1, 1, 1.5])
+if st.session_state.mundo == "NFe":
+    with c2: st.markdown('<div class="setinha-container">▼</div>', unsafe_allow_html=True)
+else:
+    with c4: st.markdown('<div class="setinha-container">▼</div>', unsafe_allow_html=True)
+
 st.markdown('<div class="linha-caderno"></div>', unsafe_allow_html=True)
 
 # ==========================================
@@ -113,25 +111,9 @@ if st.session_state.mundo == "NFe":
     
     m_col1, m_col2 = st.columns(2)
     with m_col1:
-        st.markdown("""
-        <div class="instrucoes-card">
-            <h3>📖 Manual de Uso</h3>
-            <ol>
-                <li><b>Configuração:</b> Informe o CNPJ na lateral para liberar o painel.</li>
-                <li><b>Upload:</b> Arraste arquivos XML ou ZIP para o campo rosa.</li>
-                <li><b>Processamento:</b> Extração automática das 34 colunas.</li>
-            </ol>
-        </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="instrucoes-card"><h3>📖 Manual de Uso</h3><ol><li><b>Configuração:</b> Informe o CNPJ na lateral para liberar o painel.</li><li><b>Upload:</b> Arraste arquivos XML ou ZIP para o campo rosa.</li><li><b>Processamento:</b> Extração automática das 34 colunas.</li></ol></div>', unsafe_allow_html=True)
     with m_col2:
-        st.markdown("""
-        <div class="instrucoes-card">
-            <h3>🎯 Dados Obtidos</h3>
-            <ul>
-                <li><b>Mapeamento Total:</b> 34 colunas fiscais extraídas.</li>
-                <li><b>Reforma 2026:</b> Tags de IBS, CBS e CLClass incluídas.</li>
-                <li><b>Inteligência:</b> Separação automática entre Entradas e Saídas.</li>
-            </ul>
-        </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="instrucoes-card"><h3>🎯 Dados Obtidos</h3><ul><li><b>Mapeamento Total:</b> 34 colunas fiscais extraídas.</li><li><b>Reforma 2026:</b> Tags de IBS, CBS e CLClass incluídas.</li><li><b>Inteligência:</b> Separação automática entre Entradas e Saídas.</li></ul></div>', unsafe_allow_html=True)
 
     if 'lib_nfe' not in st.session_state: st.session_state.lib_nfe = False
     with st.sidebar:
@@ -171,27 +153,9 @@ else:
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("""
-        <div class="instrucoes-card">
-            <h3>📖 Passo a Passo</h3>
-            <ol>
-                <li><b>Upload:</b> Arraste arquivos .XML ou .ZIP abaixo.</li>
-                <li><b>Ação:</b> Clique em "INICIAR AUDITORIA".</li>
-                <li><b>Conferência:</b> Analise o Diagnóstico de divergências.</li>
-                <li><b>Saída:</b> Baixe o Excel final para auditoria.</li>
-            </ol>
-        </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="instrucoes-card"><h3>📖 Passo a Passo</h3><ol><li><b>Upload:</b> Arraste arquivos .XML ou .ZIP abaixo.</li><li><b>Ação:</b> Clique em "INICIAR AUDITORIA".</li><li><b>Conferência:</b> Analise o Diagnóstico de divergências.</li><li><b>Saída:</b> Baixe o Excel final para auditoria.</li></ol></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown("""
-        <div class="instrucoes-card">
-            <h3>📊 O que será obtido?</h3>
-            <ul>
-                <li><b>Leitura Universal:</b> Dados de centenas de prefeituras consolidados.</li>
-                <li><b>Gestão de ISS:</b> Separação entre ISS Próprio e Retido.</li>
-                <li><b>Impostos Federais:</b> Captura de PIS, COFINS, CSLL e IRRF.</li>
-                <li><b>Diagnóstico:</b> Identificação de notas com retenções pendentes.</li>
-            </ul>
-        </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="instrucoes-card"><h3>📊 O que será obtido?</h3><ul><li><b>Leitura Universal:</b> Dados de centenas de prefeituras consolidados.</li><li><b>Gestão de ISS:</b> Separação entre ISS Próprio e Retido.</li><li><b>Impostos Federais:</b> Captura de PIS, COFINS, CSLL e IRRF.</li><li><b>Diagnóstico:</b> Identificação de notas com retenções pendentes.</li></ul></div>', unsafe_allow_html=True)
 
     f_nfse = st.file_uploader("Arquivos NFS-e", type=["xml", "zip"], accept_multiple_files=True, key="up_nfse")
     if f_nfse and st.button("🚀 INICIAR AUDITORIA FISCAL"):
