@@ -2,20 +2,30 @@ import streamlit as st
 import pandas as pd
 import io
 import zipfile
+# Importando seus motores independentes
 from motor_nfe import ler_xml_nfe
 from motor_nfse import process_xml_file_nfse
 
 # --- CONFIGURAÇÃO GLOBAL ---
 st.set_page_config(page_title="PORTAL TAX CENTER", page_icon="💎", layout="wide")
 
-# --- CSS BASE (UI UNIFICADA) ---
+# --- ESTILIZAÇÃO UNIFICADA (RIHANNA STYLE) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap');
-    
     header, [data-testid="stHeader"] { display: none !important; }
     .stApp { background: radial-gradient(circle at top right, #FFDEEF 0%, #F8F9FA 100%) !important; }
     
+    /* Botões Globais */
+    div.stButton > button {
+        color: #6C757D !important; background-color: #FFFFFF !important; border: 1px solid #DEE2E6 !important;
+        border-radius: 15px !important; font-family: 'Montserrat', sans-serif !important;
+        font-weight: 800 !important; height: 60px !important; text-transform: uppercase;
+        width: 100%; transition: all 0.4s ease !important;
+    }
+    div.stButton > button:hover { transform: translateY(-5px) !important; border-color: #FF69B4 !important; color: #FF69B4 !important; }
+    
+    /* Tabs Customizadas */
     .stTabs [data-baseweb="tab"] {
         height: 60px; background-color: #FFFFFF !important; border-radius: 15px 15px 0px 0px !important;
         border: 1px solid #DEE2E6 !important; font-family: 'Montserrat', sans-serif !important;
@@ -23,54 +33,38 @@ st.markdown("""
     }
     .stTabs [aria-selected="true"] { background-color: #FF69B4 !important; color: white !important; border-color: #FF69B4 !important; }
     
+    /* Sidebar */
     [data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #FFDEEF !important; min-width: 350px !important; }
     
-    div.stButton > button {
-        color: #6C757D !important; background-color: #FFFFFF !important; border: 1px solid #DEE2E6 !important;
-        border-radius: 15px !important; font-family: 'Montserrat', sans-serif !important;
-        font-weight: 800 !important; height: 60px !important; text-transform: uppercase; width: 100%;
-    }
-    div.stButton > button:hover { transform: translateY(-5px) !important; border-color: #FF69B4 !important; color: #FF69B4 !important; }
+    h1, h2, h3 { font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #FF69B4 !important; text-align: center; }
+    .instrucoes-card { background-color: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 20px; border-left: 5px solid #FF69B4; margin-bottom: 20px; min-height: 250px; }
     
+    /* Estilo Uploader */
     [data-testid="stFileUploader"] { border: 2px dashed #FF69B4 !important; border-radius: 20px !important; background: #FFFFFF !important; padding: 20px !important; }
     section[data-testid="stFileUploader"] button, div.stDownloadButton > button {
         background-color: #FF69B4 !important; color: white !important; font-weight: 700 !important; border-radius: 15px !important;
     }
-    
-    h1, h2, h3 { font-family: 'Montserrat', sans-serif; font-weight: 800 !important; color: #FF69B4 !important; text-align: center; }
-    .instrucoes-card { background-color: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 20px; border-left: 5px solid #FF69B4; margin-bottom: 20px; min-height: 250px; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CONTROLE DE ESTADO DA SIDEBAR ---
-# Usamos uma variável de estado para saber em qual aba estamos e aplicar o CSS correto no topo
-if "aba_atual" not in st.session_state:
-    st.session_state.aba_atual = "NF-e"
-
-# Injeção de CSS Dinâmico Baseado no Estado
-if st.session_state.aba_atual == "NFS-e":
-    st.markdown("<style>[data-testid='stSidebar'], [data-testid='stSidebarCollapsedControl'] { display: none !important; }</style>", unsafe_allow_html=True)
-else:
-    st.markdown("<style>[data-testid='stSidebar'], [data-testid='stSidebarCollapsedControl'] { display: block !important; }</style>", unsafe_allow_html=True)
-
-
 # --- NAVEGAÇÃO POR ABAS ---
-# O segredo aqui é capturar a mudança de aba
 tab_nfe, tab_nfse = st.tabs(["💎 PORTAL TAX NF-e", "📑 PORTAL TAX NFS-e"])
 
 # ==========================================
-# ABA NF-e
+# ABA NF-e (A SIDEBAR SÓ EXISTE AQUI)
 # ==========================================
 with tab_nfe:
-    st.session_state.aba_atual = "NF-e"
+    # Hack para forçar a Sidebar a aparecer apenas nesta aba
+    st.markdown("<style>[data-testid='stSidebar'] { display: block !important; }</style>", unsafe_allow_html=True)
     
     st.markdown("<h1>💎 MATRIZ FISCAL NF-e</h1>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
-    with c1: st.markdown('<div class="instrucoes-card"><h3>📖 Manual NF-e</h3><ol><li>Insira o CNPJ na lateral.</li><li>Arraste os arquivos.</li><li>Obtenha as 34 colunas.</li></ol></div>', unsafe_allow_html=True)
-    with c2: st.markdown('<div class="instrucoes-card"><h3>🎯 Reforma 2026</h3><ul><li>Tags IBS/CBS.</li><li>Entradas e Saídas.</li><li>Mapeamento Total.</li></ul></div>', unsafe_allow_html=True)
+    with c1: st.markdown('<div class="instrucoes-card"><h3>📖 Manual NF-e</h3><ol><li>Insira o CNPJ na lateral.</li><li>Arraste os arquivos.</li><li>Obtenha as 34 colunas fiscais.</li></ol></div>', unsafe_allow_html=True)
+    with c2: st.markdown('<div class="instrucoes-card"><h3>🎯 Reforma 2026</h3><ul><li>Tags IBS/CBS inclusas.</li><li>Separação Entrada/Saída.</li><li>Mapeamento de 34 colunas.</li></ul></div>', unsafe_allow_html=True)
     
     if 'lib_nfe' not in st.session_state: st.session_state['lib_nfe'] = False
     
+    # --- SIDEBAR DA NF-e ---
     with st.sidebar:
         st.markdown("### 🔍 Configuração NF-e")
         cnpj_in = st.text_input("CNPJ DO CLIENTE", key="in_nfe")
@@ -83,12 +77,11 @@ with tab_nfe:
             st.rerun()
 
     if st.session_state['lib_nfe']:
-        st.info(f"🏢 Operando CNPJ: {cnpj_l}")
-        files = st.file_uploader("Arquivos NF-e", type=["xml", "zip"], accept_multiple_files=True, key="u_nfe")
+        files_nfe = st.file_uploader("Arquivos NF-e (XML/ZIP)", type=["xml", "zip"], accept_multiple_files=True, key="up_nfe")
         if st.button("🚀 PROCESSAR MATRIZ NF-e"):
             res_nfe = []
             with st.spinner("Brilhando nos dados..."):
-                for f in files:
+                for f in files_nfe:
                     if f.name.endswith('.zip'):
                         with zipfile.ZipFile(f) as z:
                             for n in z.namelist():
@@ -97,31 +90,29 @@ with tab_nfe:
             if res_nfe:
                 df = pd.DataFrame(res_nfe)
                 out = io.BytesIO()
-                df.to_excel(out, index=False, engine='xlsxwriter')
+                df.to_excel(out, index=False)
                 st.success(f"✨ {len(df)} itens processados!")
                 st.download_button("📥 BAIXAR MATRIZ DIAMANTE", out.getvalue(), f"matriz_{cnpj_l}.xlsx")
-    else: st.warning("👈 Insira o CNPJ na lateral.")
+    else:
+        st.warning("👈 Insira o CNPJ na lateral para começar.")
 
 # ==========================================
-# ABA NFS-e
+# ABA NFS-e (SIDEBAR ESCONDIDA AQUI)
 # ==========================================
 with tab_nfse:
-    st.session_state.aba_atual = "NFS-e"
-    # Forçamos um rerun imediato se a aba mudou para garantir que o CSS do topo seja aplicado
-    if st.session_state.aba_atual == "NFS-e" and st.session_state.get('last_aba') != "NFS-e":
-        st.session_state.last_aba = "NFS-e"
-        st.rerun()
-
+    # Hack para forçar a Sidebar a sumir nesta aba
+    st.markdown("<style>[data-testid='stSidebar'] { display: none !important; }</style>", unsafe_allow_html=True)
+    
     st.markdown("<h1>📑 PORTAL TAX NFS-e</h1>", unsafe_allow_html=True)
     c3, c4 = st.columns(2)
-    with c3: st.markdown('<div class="instrucoes-card"><h3>📖 Manual NFS-e</h3><ol><li>Arraste os arquivos XML/ZIP.</li><li>Clique em Auditoria.</li><li>Analise o Diagnóstico.</li></ol></div>', unsafe_allow_html=True)
+    with c3: st.markdown('<div class="instrucoes-card"><h3>📖 Manual NFS-e</h3><ol><li>Arraste os arquivos XML/ZIP.</li><li>Clique em Auditoria.</li><li>Analise o Diagnóstico visual.</li></ol></div>', unsafe_allow_html=True)
     with c4: st.markdown('<div class="instrucoes-card"><h3>📊 Diagnóstico</h3><ul><li>ISS Próprio vs Retido.</li><li>Retenções Federais.</li><li>Universalidade Prefeituras.</li></ul></div>', unsafe_allow_html=True)
     
-    files_s = st.file_uploader("Arquivos NFS-e", type=["xml", "zip"], accept_multiple_files=True, key="u_nfse")
-    if files_s and st.button("🚀 INICIAR AUDITORIA NFS-e"):
+    files_nfse = st.file_uploader("Arquivos NFS-e (XML/ZIP)", type=["xml", "zip"], accept_multiple_files=True, key="up_nfse")
+    if files_nfse and st.button("🚀 INICIAR AUDITORIA NFS-e"):
         res_nfse = []
         with st.spinner("Auditando..."):
-            for f in files_s:
+            for f in files_nfse:
                 if f.name.endswith('.zip'):
                     with zipfile.ZipFile(f) as z:
                         for n in z.namelist():
@@ -133,14 +124,14 @@ with tab_nfse:
                     if r: res_nfse.append(r)
         if res_nfse:
             df_s = pd.DataFrame(res_nfse)
+            # Formatações do seu código original
             cols_v = ['Vlr_Bruto', 'Vlr_Liquido', 'ISS_Valor', 'Ret_ISS', 'Ret_PIS', 'Ret_COFINS', 'Ret_CSLL', 'Ret_IRRF']
             for c in cols_v: df_s[c] = pd.to_numeric(df_s[c], errors='coerce').fillna(0.0)
             df_s['Diagnostico'] = df_s.apply(lambda r: "⚠️ Divergência!" if abs(r['Vlr_Bruto'] - r['Vlr_Liquido']) > 0.01 else "✅", axis=1)
+            
+            st.success(f"✅ {len(df_s)} notas auditadas!")
             st.dataframe(df_s)
+            
             out_s = io.BytesIO()
             df_s.to_excel(out_s, index=False)
             st.download_button("📥 BAIXAR AUDITORIA EXCEL", out_s.getvalue(), "auditoria_nfse.xlsx")
-
-# Limpeza de estado para quando voltar para NF-e
-if st.session_state.aba_atual == "NF-e":
-    st.session_state.last_aba = "NF-e"
